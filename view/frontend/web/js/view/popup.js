@@ -21,7 +21,7 @@ define([
     "use strict";
 
     return Component.extend({
-        showPopUp: ko.observable(null),
+        showPopUp: ko.observable(false),
         popupText: ko.observable(null),
         popupLink: ko.observable(null),
 
@@ -33,16 +33,27 @@ define([
          * Initialize component
          */
         initialize() {
+            var self = this,
+                cookieState = window.localStorage.getItem(this.cookieName);
+
             this._super();
 
-            this.showPopUp(!$.cookie(this.cookieName));
-            this.popupText(this.notificationText);
-            this.popupLink(this.learnMore);
+            if (!cookieState) {
+                self.showPopUp(true);
+            }
 
-            $(document).on("click", "#enhanced-privacy-popup-agree", function () {
-                this.showPopUp(false);
-                $.cookie(this.cookieName, 1);
-            }.bind(this));
+            self.popupText(self.notificationText);
+            self.popupLink(self.learnMore);
+        },
+
+        /**
+         * Accept All Cookies
+         */
+        acceptAllCookies() {
+            var self = this;
+
+            window.localStorage.setItem(self.cookieName, 1, {});
+            self.showPopUp(false);
         }
     });
 });
